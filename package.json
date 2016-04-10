@@ -1,0 +1,41 @@
+{
+  "name": "easy-resto",
+  "version": "1.0.0",
+  "description": "EasyResto is a restaurant transaction and management system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Natan Elia",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "bluebird": "^3.3.4",
+    "body-parser": "^1.15.0",
+    "cors": "^2.7.1",
+    "debug": "^2.2.0",
+    "express": "^4.13.4",
+    "jade": "^1.11.0",
+    "lodash": "^4.9.0",
+    "morgan": "^1.7.0",
+    "mysql": "^2.10.2",
+    "path": "^0.12.7",
+    "sequelize": "^3.21.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/natanelia/easy-resto"
+  },
+  "keywords": [
+    "restaurant",
+    "management",
+    "system"
+  ],
+  "bugs": {
+    "url": "https://github.com/natanelia/easy-resto/issues"
+  },
+  "homepage": "https://github.com/natanelia/easy-resto",
+  "devDependencies": {
+    "sequelize-cli": "^2.3.1"
+  }
+}

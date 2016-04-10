@@ -1,0 +1,71 @@
+doctype html
+html
+  head
+    title TLE
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+
+  body
+    nav.navbar.navbar-inverse
+      .container
+        .navbar-header
+          a.navbar-brand= "TLE"
+    .container
+      h1 Recent Submission
+      table.table.table-striped
+        thead
+          tr
+            th user
+            th problem
+            th verdict
+            th score
+            th time
+        tbody
+          each submission in submissions
+            tr
+              td= submission.username
+              td= submission.problemSlug
+              td= submission.verdictName
+              td= submission.score
+              td= submission.submitTime
+
+    hr
+    .container
+      .text-center
+        h1 Next Problem to Solve
+      table.table.table-striped
+        thead
+          tr
+            th id
+            th Problems
+            th Accepted User
+            th Total Submissions
+            th Accepted Submissions
+        tbody
+          each problem in problems
+            tr
+              td= problem.id
+              td= problem.slug
+              td= problem.acceptedUser
+              td= problem.totalSubmission
+              td= problem.acceptedSubmission
+
+    hr
+    .container
+      .text-center
+        h1 Top User
+      table.table.table-striped
+        thead
+          tr
+            th id
+            th Submitter
+            th accepted
+            th total submissions
+            th accepted submissions
+        tbody
+          each user in users
+            tr
+              td= user.id
+              td= user.username + "  (" + user.name + ")"
+              td= user.acceptedProblem
+              td= user.totalSubmission
+              td= user.acceptedSubmission
