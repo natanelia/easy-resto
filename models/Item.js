@@ -35,6 +35,7 @@ var ItemModel = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
           Item.belongsToMany(models.Pesanan, {
+            as: 'pesanan',
             through: models.ItemPesanan,
             foreignKey: 'itemId',
             otherKey: 'pesananId',

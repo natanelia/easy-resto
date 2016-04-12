@@ -11,6 +11,7 @@ var models = require("./models");
 var menuApi = require('./routes/api/v1/menu');
 var pesananApi = require('./routes/api/v1/pesanan');
 var mejaApi = require('./routes/api/v1/meja');
+var statistikApi = require('./routes/api/v1/statistik');
 
 var app = express();
 
@@ -29,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/v1/menu', menuApi);
 app.use('/api/v1/pesanan', pesananApi);
 app.use('/api/v1/meja', mejaApi);
+app.use('/api/v1/statistik', statistikApi);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
