@@ -154,7 +154,12 @@ StatistikService.lihatStatistikItem = function(params) {
 
   return models.Item.findAll(args).map(function(item) {
     result.labels.push(item.nama);
-    result.data.push(item.pesanan.length);
+
+    var count = 0;
+    item.pesanan.map(function(pesanan) {
+      count += pesanan.ItemPesanan.count;
+    });
+    result.data.push(count);
     return item;
   }).then(function() {
     return result;
@@ -195,7 +200,12 @@ StatistikService.lihatStatistikHari = function(params) {
 
   return models.Item.findAll(args).map(function(item) {
     result.labels.push(item.nama);
-    result.data.push(item.pesanan.length);
+
+    var count = 0;
+    item.pesanan.map(function(pesanan) {
+      count += pesanan.ItemPesanan.count;
+    });
+    result.data.push(count);
     return item;
   }).then(function() {
     return result;
