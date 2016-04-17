@@ -9,8 +9,9 @@ var StatistikService = function() {};
 
 StatistikService.lihatStatistikPemesanan = function(params) {
   var specificity = params.specificity;
-  var startDate = (params.startDate);
+  var startDate = params.startDate;
   var endDate = params.endDate;
+
 
   var args = {
     attributes: [],
@@ -20,16 +21,39 @@ StatistikService.lihatStatistikPemesanan = function(params) {
   };
 
   if (startDate || endDate) args.where.tanggalBuat = {};
-  if (startDate && !endDate)
+  if (startDate && !endDate) {
     args.where.tanggalBuat.$gt = new Date(startDate);
-  else if (startDate && endDate) {
+    args.where.tanggalBuat.$gt.setDate(1);
+    args.where.tanggalBuat.$gt.setHours(0);
+    args.where.tanggalBuat.$gt.setMinutes(0);
+    args.where.tanggalBuat.$gt.setSeconds(0);
+  } else if (startDate && endDate) {
     args.where.tanggalBuat.$between = [
       new Date(startDate),
-      new Date(endDate),
+      new Date(endDate)
     ];
+    args.where.tanggalBuat.$between[0].setDate(1);
+    args.where.tanggalBuat.$between[0].setHours(0);
+    args.where.tanggalBuat.$between[0].setMinutes(0);
+    args.where.tanggalBuat.$between[0].setSeconds(0);
+
+    args.where.tanggalBuat.$between[1].setMonth(args.where.tanggalBuat.$between[1].getMonth() + 1);
+    args.where.tanggalBuat.$between[1].setDate(1);
+    args.where.tanggalBuat.$between[1].setDate(args.where.tanggalBuat.$between[1].getDate() - 1);
+    args.where.tanggalBuat.$between[1].setHours(0);
+    args.where.tanggalBuat.$between[1].setMinutes(0);
+    args.where.tanggalBuat.$between[1].setSeconds(0);
   } else if (!startDate && endDate) {
     args.where.tanggalBuat.$lt = new Date(endDate);
+    args.where.tanggalBuat.$lt.setMonth(args.where.tanggalBuat.$lt.getMonth() + 1);
+    args.where.tanggalBuat.$lt.setDate(1);
+    args.where.tanggalBuat.$lt.setDate(args.where.tanggalBuat.$lt.getDate() - 1);
+    args.where.tanggalBuat.$lt.setHours(0);
+    args.where.tanggalBuat.$lt.setMinutes(0);
+    args.where.tanggalBuat.$lt.setSeconds(0);
   }
+  startDate = new Date(startDate);
+  endDate = new Date(endDate);
 
   var groupByYear = sequelize.fn('year', sequelize.col('Pesanan.tanggal_buat'));
   var groupByMonth = sequelize.fn('month', sequelize.col('Pesanan.tanggal_buat'));
@@ -67,56 +91,36 @@ StatistikService.lihatStatistikPemesanan = function(params) {
 
   return models.Pesanan.findAll(args)
   .then(function(stats) {
-    if (specificity === 'yearly') {
-      var startYear = stats[0].get('year');
-      var endYear = stats[stats.length - 1].get('year');
-      for (var i = startYear; i <= endYear; i++) {
-        result.labels.push(i);
-        if (i === stats[c].get('year')) {
-          result.data.push(stats[c].count);
-          c++;
-        } else {
-          result.data.push(0);
+    var startYear = startDate.getFullYear();
+    var endYear = endDate.getFullYear();
+    for (var i = startYear; i <= endYear; i++) {
+      if (i !== endYear) {
+        for (var j = startDate.getMonth() + 1; j <= 12; j++) {
+          result.labels.push([j, i]);
         }
-      }
-    // } else if (specificity === 'monthly') {
-    } else {
-      var startYear = stats[0].get('year');
-      var endYear = stats[stats.length - 1].get('year');
-      for (var i = startYear; i <= endYear; i++) {
-        if (i !== endYear) {
-          for (var j = stats[0].get('month'); j <= 12; j++) {
+      } else {
+        if (startYear === endYear) {
+          for (var j = startDate.getMonth() + 1; j <= endDate.getMonth() + 1; j++) {
             result.labels.push([j, i]);
           }
         } else {
-          if (startYear === endYear) {
-            for (var j = stats[0].get('month'); j <= stats[stats.length - 1].get('month'); j++) {
-              result.labels.push([j, i]);
-            }
-          } else {
-            for (var j = 1; j <= stats[stats.length - 1].get('month'); j++) {
-              result.labels.push([j, i]);
-            }
+          for (var j = 1; j <= endDate.getMonth() + 1; j++) {
+            result.labels.push([j, i]);
           }
         }
       }
-
-      var c = 0;
-      for (var i = 0; i < result.labels.length; i++) {
-        if (stats[c].get('year') === result.labels[i][1] && stats[c].get('month') === result.labels[i][0]) {
-          result.data.push(stats[c].get('count'));
-          c++;
-        } else {
-          result.data.push(0);
-        }
-        result.labels[i] = months[result.labels[i][0] - 1] + ' ' + result.labels[i][1];
-      }
     }
-    // } else if (specificity === 'weekly') {
 
-    // } else { //daily
-    //
-    // }
+    var c = 0;
+    for (var i = 0; i < result.labels.length; i++) {
+      if (stats[c].get('year') === result.labels[i][1] && stats[c].get('month') === result.labels[i][0]) {
+        result.data.push(stats[c].get('count'));
+        c++;
+      } else {
+        result.data.push(0);
+      }
+      result.labels[i] = months[result.labels[i][0] - 1] + ' ' + result.labels[i][1];
+    }
 
     return result;
   });
@@ -134,16 +138,16 @@ StatistikService.lihatStatistikItem = function(params) {
     }],
   };
 
-  if (startDate || endDate) args.where.tanggalBuat = {};
+  if (startDate || endDate) args.include.where = { tanggalBuat: {}};
   if (startDate && !endDate)
-    args.where.tanggalBuat.$gt = new Date(startDate);
+    args.include.where.tanggalBuat.$gt = new Date(startDate);
   else if (startDate && endDate) {
-    args.where.tanggalBuat.$between = [
+    args.include.where.tanggalBuat.$between = [
       new Date(startDate),
       new Date(endDate),
     ];
   } else if (!startDate && endDate) {
-    args.where.tanggalBuat.$lt = new Date(endDate);
+    args.include.where.tanggalBuat.$lt = new Date(endDate);
   }
 
   var result = {
