@@ -17,7 +17,7 @@ StatistikService.lihatStatistikPemesanan = function(params) {
     attributes: [],
     where: {},
     group: [],
-    order: sequelize.col('Pesanan.tanggal_buat'),
+    order: sequelize.fn('ANY_VALUE', sequelize.col('Pesanan.tanggal_buat')),
   };
 
   if (startDate || endDate) args.where.tanggalBuat = {};
@@ -110,6 +110,8 @@ StatistikService.lihatStatistikPemesanan = function(params) {
         }
       }
     }
+
+    if (stats.length === 0) return result;
 
     var c = 0;
     for (var i = 0; i < result.labels.length; i++) {

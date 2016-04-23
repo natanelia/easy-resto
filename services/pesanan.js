@@ -124,38 +124,40 @@ PesananService.ubahPesanan = function(params) {
     }).then(function(pesanan) {
       pesananId = pesanan.dataValues.id;
       var promises = [];
-      req.items.map(function(item) {
-        if (item.count) {
-          promises.push(models.ItemPesanan.findOne({
-            where: {
-              pesananId: pesananId,
-              itemId: item.id,
-            }
-          }).then(function(itemPesanan) {
-            if (itemPesanan) {
-              itemPesanan.count = item.count;
-              return itemPesanan.save();
-            } else {
-              return models.ItemPesanan.create({
+      if (req.items) {
+        req.items.map(function(item) {
+          if (item.count) {
+            promises.push(models.ItemPesanan.findOne({
+              where: {
                 pesananId: pesananId,
                 itemId: item.id,
-                count: item.count,
-              });
-            }
-          }));
-        } else {
-          promises.push(models.ItemPesanan.findOne({
-            where: {
-              pesananId: pesananId,
-              itemId: item.id,
-            }
-          }).then(function(itemPesanan) {
-            if (itemPesanan) {
-              return itemPesanan.destroy();
-            }
-          }));
-        }
-      });
+              }
+            }).then(function(itemPesanan) {
+              if (itemPesanan) {
+                itemPesanan.count = item.count;
+                return itemPesanan.save();
+              } else {
+                return models.ItemPesanan.create({
+                  pesananId: pesananId,
+                  itemId: item.id,
+                  count: item.count,
+                });
+              }
+            }));
+          } else {
+            promises.push(models.ItemPesanan.findOne({
+              where: {
+                pesananId: pesananId,
+                itemId: item.id,
+              }
+            }).then(function(itemPesanan) {
+              if (itemPesanan) {
+                return itemPesanan.destroy();
+              }
+            }));
+          }
+        });
+      }
 
       if (typeof req.mejaId === 'number') {
         promises.push(models.MejaPesanan.findOne({
